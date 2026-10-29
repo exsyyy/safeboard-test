@@ -1,3 +1,30 @@
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
+  background: #101820;
+  color: #dfe9e9;
+  font-family: 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #ffba75;
+  outline-offset: 4px;
+}
+button {
+  font-family: inherit;
+}
+::selection {
+  color: #101820;
+  background: #ffba75;
 }

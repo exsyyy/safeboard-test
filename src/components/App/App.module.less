@@ -1,3 +1,387 @@
-.app {
+@paper: #dfe9e9;
+@amber: #ffba75;
+@muted: #8298a1;
+
+.page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.cabinet {
+  display: flex;
+  flex-direction: column;
+  height: calc(100svh - 32px);
+  min-height: 420px;
+  max-height: 1100px;
+  overflow: hidden;
+  border: 1px solid #35434c;
+  border-radius: 6px;
+  background: #111c24;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #283741;
+  min-height: 49px;
+}
+.topbar h1 {
+  margin: 0;
+  font: 600 18px 'Bahnschrift', 'Segoe UI', sans-serif;
+  letter-spacing: 1px;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tools button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 30px;
+  padding: 0;
+  color: #a4b9c4;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-size: 21px;
+  cursor: pointer;
+}
+.tools button:hover {
+  color: @paper;
+  border-color: #455963;
+}
+.tools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.consoleTop {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  min-height: 68px;
+  padding: 10px 18px;
+  background: #101b24;
+  border-bottom: 1px solid #283741;
+}
+.stats {
+  display: flex;
+  gap: 35px;
+}
+.stats > div,
+.lives {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stats span,
+.lives > span,
+.heat span {
+  color: @muted;
+  font: 11px 'Consolas', monospace;
+}
+.stats strong {
+  font: 23px 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+.lives strong {
+  display: flex;
+  gap: 5px;
+}
+.lives b {
+  font: 23px 'Consolas', monospace;
+  font-weight: 400;
+  color: #d0e6de;
+}
+.lives .lost {
+  color: #384951;
+}
+.heat {
+  width: 180px;
+  margin-left: auto;
+}
+.heat > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.heat strong {
+  color: @amber;
+  font: 11px 'Consolas', monospace;
+}
+.heatTrack {
+  height: 5px;
+  overflow: hidden;
+  background: #2b3840;
+}
+.heatTrack > div {
+  height: 100%;
+  background: @amber;
+  transition: width 80ms linear;
+}
+.hot strong {
+  color: #ff827b;
+}
+.hot .heatTrack > div {
+  background: #ff827b;
+}
+.viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #080e14;
+}
+.viewport canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+.viewport canvas:focus-visible {
+  outline: 1px solid #91b9ba;
+  outline-offset: -2px;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #080e1480;
+}
+.startPanel {
+  width: min(100%, 440px);
   text-align: center;
+  padding: 24px;
+  background: #0b151ff2;
+  border: 1px solid #334752;
+  border-radius: 4px;
+}
+.startPanel h2 {
+  font: 600 clamp(25px, 3vw, 38px) 'Bahnschrift', sans-serif;
+  margin: 0 0 15px;
+}
+.startPanel p {
+  margin: 0 0 22px;
+  color: #a9bdc7;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.startButton {
+  min-width: 180px;
+  padding: 12px 24px;
+  background: @amber;
+  color: #172027;
+  border: 1px solid #ffdbac;
+  border-radius: 3px;
+  font: 600 15px 'Segoe UI', sans-serif;
+  cursor: pointer;
+}
+.startButton:hover {
+  background: #ffd09b;
+}
+.startPanel small {
+  display: block;
+  margin-top: 16px;
+  color: @muted;
+  font: 11px 'Consolas', monospace;
+  line-height: 1.7;
+}
+.overheatNotice {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 15px;
+  color: #ff9585;
+  font: 12px 'Consolas', monospace;
+  background: #281b1cde;
+  border: 1px solid #74433f;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.controlDeck {
+  padding: 10px 16px;
+  border-top: 1px solid #283741;
+}
+.controlGroup {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 70px;
+  min-height: 52px;
+  color: #c6d6db;
+  background: #1b2a35;
+  border: 1px solid #40535e;
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+}
+.control > span {
+  font-size: 23px;
+  line-height: 1;
+}
+.control > small {
+  font: 9px 'Consolas', monospace;
+  color: #93a6b1;
+}
+.control:hover:not(:disabled),
+.pressed {
+  background: #364b59;
+  border-color: #a0b6be;
+}
+.control:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.control.fire {
+  margin-left: 8px;
+  min-width: 120px;
+  color: #ffd6ae;
+  background: #443227;
+  border-color: #886347;
+}
+.control.fire > span {
+  font: 600 14px 'Segoe UI', sans-serif;
+}
+.control.fire:hover:not(:disabled),
+.control.fire.pressed {
+  background: #745039;
+  border-color: @amber;
+}
+.cabinet:fullscreen {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 0;
+  }
+  .cabinet {
+    height: 100svh;
+    min-height: 390px;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .topbar {
+    padding: 7px 12px;
+    min-height: 44px;
+  }
+  .topbar h1 {
+    font-size: 16px;
+  }
+  .consoleTop {
+    gap: 20px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    min-height: 0;
+  }
+  .stats {
+    gap: 22px;
+  }
+  .stats strong,
+  .lives b {
+    font-size: 20px;
+  }
+  .heat {
+    width: 125px;
+  }
+  .controlDeck {
+    padding: 10px;
+  }
+  .controlGroup {
+    gap: 7px;
+  }
+  .control {
+    flex: 1;
+    min-width: 0;
+    min-height: 55px;
+  }
+  .control.fire {
+    flex: 1.5;
+    min-width: 0;
+    margin-left: 4px;
+  }
+  .startPanel {
+    padding: 20px;
+  }
+  .startPanel p {
+    font-size: 12px;
+  }
+}
+@media (max-width: 380px) {
+  .heat {
+    width: 100%;
+  }
+}
+@media (max-height: 500px) and (min-width: 600px) {
+  .page {
+    padding: 0;
+  }
+  .cabinet {
+    min-height: 0;
+    height: 100svh;
+    border: 0;
+  }
+  .topbar {
+    min-height: 34px;
+    padding: 2px 12px;
+  }
+  .consoleTop {
+    min-height: 45px;
+    padding: 4px 12px;
+  }
+  .stats > div,
+  .lives {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .controlDeck {
+    padding: 4px;
+  }
+  .control {
+    min-height: 38px;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .startPanel {
+    padding: 12px;
+  }
+  .startPanel h2 {
+    margin-bottom: 6px;
+    font-size: 23px;
+  }
+  .startPanel p {
+    margin-bottom: 10px;
+  }
+  .startPanel small {
+    margin-top: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .heatTrack > div {
+    transition: none;
+  }
 }
