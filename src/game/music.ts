@@ -1,7 +1,11 @@
-// Original procedural score for this game. No samples or third-party compositions.
-const ROOTS = [40, 36, 43, 38];
-const ARPEGGIO: (number | null)[] = [24, 31, 36, 31, 27, 31, 34, 31, 24, 31, 36, 38, 36, 31, 27, null];
-const STEP = 0.24;
+// Original ambient score. No samples or third-party compositions.
+const CHORDS = [
+  [45, 52, 59],
+  [41, 48, 55],
+  [43, 50, 57],
+  [40, 47, 54],
+];
+const STEP = 5.4;
 
 export function createMusic(context: AudioContext) {
   let playing = false;
@@ -9,16 +13,15 @@ export function createMusic(context: AudioContext) {
   let position = 0;
   const voices = new Map<OscillatorNode, GainNode>();
 
-  function note(midi: number, time: number, duration: number, sound: { volume: number; type: OscillatorType }) {
-    const { volume, type } = sound;
+  function note(midi: number, time: number) {
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    oscillator.type = type;
+    oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(440 * 2 ** ((midi - 69) / 12), time);
     gain.gain.value = 0;
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(volume, time + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    gain.gain.exponentialRampToValueAtTime(0.012, time + 1.4);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 6.8);
     oscillator.connect(gain);
     gain.connect(context.destination);
     voices.set(oscillator, gain);
@@ -28,7 +31,7 @@ export function createMusic(context: AudioContext) {
       voices.delete(oscillator);
     };
     oscillator.start(time);
-    oscillator.stop(time + duration + 0.02);
+    oscillator.stop(time + 6.85);
   }
 
   return {
@@ -39,8 +42,8 @@ export function createMusic(context: AudioContext) {
       if (!value) {
         voices.forEach((gain, oscillator) => {
           gain.gain.cancelScheduledValues(context.currentTime);
-          gain.gain.setTargetAtTime(0, context.currentTime, 0.008);
-          oscillator.stop(context.currentTime + 0.03);
+          gain.gain.setTargetAtTime(0, context.currentTime, 0.025);
+          oscillator.stop(context.currentTime + 0.12);
         });
         voices.clear();
       }
@@ -49,14 +52,9 @@ export function createMusic(context: AudioContext) {
       if (!playing || context.state !== 'running') return;
       if (nextNote < context.currentTime) nextNote = context.currentTime + 0.03;
       while (nextNote < context.currentTime + 0.12) {
-        const root = ROOTS[Math.floor(position / 16) % ROOTS.length];
-        const melody = ARPEGGIO[position % ARPEGGIO.length];
-        if (melody !== null) note(root + melody, nextNote, STEP * 0.7, { volume: 0.012, type: 'square' });
-        if (position % 4 === 0) {
-          note(root, nextNote, STEP * 2.5, { volume: 0.045, type: 'triangle' });
-          note(28, nextNote, 0.055, { volume: 0.035, type: 'sine' });
-        }
-        position = (position + 1) % 64;
+        const time = nextNote;
+        CHORDS[position].forEach((midi) => note(midi, time));
+        position = (position + 1) % CHORDS.length;
         nextNote += STEP;
       }
     },

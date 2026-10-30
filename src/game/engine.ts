@@ -111,8 +111,8 @@ function playerShot(state: GameState, input: InputState) {
   const dy = Math.sin(ship.angle);
   state.bullets.push({
     id: state.nextId,
-    x: wrap(ship.x + dx * 19, config.width),
-    y: wrap(ship.y + dy * 19, config.height),
+    x: ship.x + dx * 19,
+    y: ship.y + dy * 19,
     vx: dx * config.bulletSpeed + ship.vx * 0.3,
     vy: dy * config.bulletSpeed + ship.vy * 0.3,
     radius: 2,
@@ -198,7 +198,10 @@ function hitTargets(state: GameState) {
   const children: Rock[] = [];
   state.bullets.forEach((bullet) => {
     if (bullet.enemy || bullet.life <= 0) return;
-    const rock = state.asteroids.find((item) => !deadRocks.has(item.id) && overlaps(bullet, item, state.config));
+    const rock = state.asteroids.find(
+      (item) =>
+        !deadRocks.has(item.id) && Math.hypot(bullet.x - item.x, bullet.y - item.y) < bullet.radius + item.radius,
+    );
     if (rock) {
       deadRocks.add(rock.id);
       bullet.life = 0;
@@ -211,7 +214,10 @@ function hitTargets(state: GameState) {
       state.events.push('explosion');
       return;
     }
-    const ufo = state.ufos.find((item) => !deadUfos.has(item.id) && overlaps(bullet, item, state.config));
+    const ufo = state.ufos.find(
+      (item) =>
+        !deadUfos.has(item.id) && Math.hypot(bullet.x - item.x, bullet.y - item.y) < bullet.radius + item.radius,
+    );
     if (ufo) {
       deadUfos.add(ufo.id);
       bullet.life = 0;
@@ -227,7 +233,10 @@ function hitTargets(state: GameState) {
 function damageShip(state: GameState) {
   if (state.ship.invulnerable > 0) return;
   const enemyBullet = state.bullets.find(
-    (bullet) => bullet.enemy && bullet.life > 0 && overlaps(bullet, state.ship, state.config),
+    (bullet) =>
+      bullet.enemy &&
+      bullet.life > 0 &&
+      Math.hypot(bullet.x - state.ship.x, bullet.y - state.ship.y) < bullet.radius + state.ship.radius,
   );
   const collision =
     enemyBullet ||
@@ -268,7 +277,10 @@ export function stepGame(state: GameState, input: InputState, dtSeconds: number)
     rock.angle += rock.spin * dt;
   });
   state.bullets.forEach((bullet) => {
-    advance(bullet, dt, state.config);
+    bullet.x += bullet.vx * dt;
+    bullet.y += bullet.vy * dt;
+    if (bullet.x < 0 || bullet.x >= state.config.width || bullet.y < 0 || bullet.y >= state.config.height)
+      bullet.life = 0;
     bullet.life -= dt;
   });
   updateUfos(state, dt);

@@ -92,6 +92,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, inpu
         ctx.restore();
       });
       state.bullets.forEach((bullet) => {
+        if (ox !== 0 || oy !== 0) return;
         ctx.fillStyle = bullet.enemy ? '#ff8e81' : '#e6fff7';
         ctx.shadowColor = ctx.fillStyle;
         ctx.shadowBlur = 8;
