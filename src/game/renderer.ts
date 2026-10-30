@@ -1,3 +1,4 @@
+import { drawStarfield } from './starfield';
 import type { GameState, InputState } from './types';
 
 function path(ctx: CanvasRenderingContext2D, points: number[][], close = true) {
@@ -15,7 +16,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, inpu
   const { width, height } = state.config;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
-  ctx.fillStyle = '#080e14';
+  ctx.fillStyle = '#020309';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   const canvasScale = Math.min(ctx.canvas.width / width, ctx.canvas.height / height);
   ctx.save();
@@ -24,26 +25,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, inpu
   ctx.beginPath();
   ctx.rect(0, 0, width, height);
   ctx.clip();
-  for (let n = 0; n < 95; n += 1) {
-    const x = (n * 137.509 + 31) % width;
-    const y = (n * n * 17.13 + 43) % height;
-    ctx.fillStyle = n % 7 === 0 ? '#627782' : '#263641';
-    ctx.fillRect(x, y, n % 7 === 0 ? 2 : 1, 1);
-  }
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = '#12212b';
-  for (let x = 0; x < width; x += 80) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-    ctx.stroke();
-  }
-  for (let y = 0; y < height; y += 75) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
-  }
+  drawStarfield(ctx, width, height);
   // Draw adjacent copies so objects cross the toroidal boundaries smoothly.
   for (let ox = -width; ox <= width; ox += width) {
     for (let oy = -height; oy <= height; oy += height) {

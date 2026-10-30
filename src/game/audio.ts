@@ -1,16 +1,32 @@
+import { createMusic } from './music';
+
 export function createAudio() {
   let context: AudioContext | null = null;
   let enabled = true;
+  let playing = false;
+  let music: ReturnType<typeof createMusic> | null = null;
   let lastExplosion = -1;
   return {
     unlock() {
-      if (!context) context = new AudioContext();
+      if (!context) {
+        context = new AudioContext();
+        music = createMusic(context);
+      }
+      music?.setPlaying(playing && enabled);
       context.resume().catch(() => {
         /* Sound is optional when browser audio is unavailable. */
       });
     },
     setEnabled(value: boolean) {
       enabled = value;
+      music?.setPlaying(playing && enabled);
+    },
+    setPlaying(value: boolean) {
+      playing = value;
+      music?.setPlaying(playing && enabled);
+    },
+    update() {
+      music?.tick();
     },
     play(event: string) {
       if (!context || !enabled || context.state !== 'running') return;
@@ -38,6 +54,8 @@ export function createAudio() {
       };
     },
     dispose() {
+      music?.setPlaying(false);
+      music = null;
       context?.close().catch(() => {
         /* The context may already be closed. */
       });

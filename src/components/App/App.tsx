@@ -75,6 +75,7 @@ export const App = () => {
 
   function changeScreen(next: Screen) {
     mode.current = next;
+    audio.current.setPlaying(next === 'playing');
     setScreen(next);
     input.current.reset();
     setPressed(input.current.read());
@@ -145,6 +146,7 @@ export const App = () => {
           if (game.current.status === 'gameover') finishGame();
         }
       } else clock.accumulator = 0;
+      audio.current.update();
       renderGame(ctx, game.current, mode.current === 'playing' ? input.current.read() : undefined);
       if (time - clock.lastHud > 80 && mode.current === 'playing') {
         setHud(snapshot(game.current));
