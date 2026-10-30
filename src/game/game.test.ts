@@ -184,3 +184,87 @@ describe('input sources', () => {
     expect(input.read()).toEqual(idle);
   });
 });
+
+it.each([false, true])('removes outgoing projectiles on all edges, enemy=%s', (enemy) => {
+  const game = emptyGame();
+  game.bullets = [
+    { x: 1, y: 200, vx: -100, vy: 0 },
+    { x: 959, y: 200, vx: 100, vy: 0 },
+    { x: 200, y: 1, vx: 0, vy: -100 },
+    { x: 200, y: 599, vx: 0, vy: 100 },
+  ].map((body, n) => ({ ...body, id: 100 + n, radius: 2, life: 1, enemy }));
+  stepGame(game, idle, 0.02);
+  expect(game.bullets).toHaveLength(0);
+});
+
+it('does not let an enemy bullet hit the ship across the opposite edge', () => {
+  const game = emptyGame();
+  game.ship.x = 2;
+  game.ship.y = 200;
+  game.ship.invulnerable = 0;
+  game.bullets.push({ id: 100, x: 958, y: 200, vx: 0, vy: 0, radius: 3, life: 1, enemy: true });
+  stepGame(game, idle, 0.01);
+  expect(game.lives).toBe(3);
+});
+
+it('does not create a player shot on the opposite edge when its muzzle is outside', () => {
+  const game = emptyGame();
+  game.ship.x = 959;
+  game.ship.angle = 0;
+  stepGame(game, { ...idle, fire: true }, 0.01);
+  expect(game.bullets).toHaveLength(0);
+});
+
+it('cannot hit a rock through the opposite edge', () => {
+  const game = emptyGame();
+  game.asteroids.push({ id: 90, x: 2, y: 200, vx: 0, vy: 0, radius: 10, size: 1, angle: 0, spin: 0, shape: [1, 1, 1] });
+  game.bullets.push({ id: 100, x: 958, y: 200, vx: 0, vy: 0, radius: 2, life: 1, enemy: false });
+  stepGame(game, idle, 0.01);
+  expect(game.score).toBe(0);
+  expect(game.asteroids).toHaveLength(1);
+});
+
+it('keeps new waves clear of a ship across the wrapped edge', () => {
+  const game = createGame(CONFIG, 13);
+  game.asteroids = [];
+  game.ufos = [];
+  game.ufoTimer = 100;
+  game.waveTimer = 0;
+  game.ship.x = 2;
+  game.ship.y = 300;
+  game.ship.invulnerable = 0;
+  stepGame(game, idle, 1 / 120);
+  expect(game.wave).toBe(2);
+  stepGame(game, idle, 1 / 120);
+  expect(game.lives).toBe(3);
+});
+
+it('caps the asteroid population in late waves', () => {
+  const game = createGame(CONFIG, 42);
+  game.asteroids = [];
+  game.ufoTimer = 100;
+  game.waveTimer = 0;
+  game.wave = 99;
+  stepGame(game, idle, 1 / 120);
+  expect(game.wave).toBe(100);
+  expect(game.asteroids).toHaveLength(14);
+  expect(game.asteroids.every((rock) => Math.hypot(rock.vx, rock.vy) <= 64 * 2.4)).toBe(true);
+});
+
+it('ends the game when the last life is lost', () => {
+  const game = emptyGame();
+  game.lives = 1;
+  game.ship.invulnerable = 0;
+  game.bullets.push({ id: 100, x: game.ship.x, y: game.ship.y, vx: 0, vy: 0, radius: 3, life: 1, enemy: true });
+  stepGame(game, idle, 0.01);
+  expect(game.status).toBe('gameover');
+  expect(game.lives).toBe(0);
+});
+
+it('limits ship speed and brakes after thrust is released', () => {
+  const game = emptyGame();
+  for (let n = 0; n < 100; n += 1) stepGame(game, { ...idle, thrust: true }, 0.05);
+  expect(Math.hypot(game.ship.vx, game.ship.vy)).toBeLessThanOrEqual(190.001);
+  for (let n = 0; n < 10; n += 1) stepGame(game, idle, 0.05);
+  expect(Math.hypot(game.ship.vx, game.ship.vy)).toBeLessThan(80);
+});

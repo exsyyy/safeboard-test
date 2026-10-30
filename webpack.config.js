@@ -1,10 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const config = () => ({
+const config = (env, argv = {}) => ({
   entry: './src/index.ts',
-  devtool: 'eval-source-map',
-  mode: 'development',
+  devtool: argv.mode === 'production' ? false : 'eval-source-map',
+  mode: argv.mode || 'development',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),

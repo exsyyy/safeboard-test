@@ -1,11 +1,10 @@
 {
-  "name": "elektronika-game",
+  "name": "safeboard-test",
   "version": "1.0.0",
-  "description": "Boiler plate for the test task, autumn 2026",
-  "main": "dist/index.js",
+  "description": "Asteroids with weapon overheating, built with React and TypeScript",
   "scripts": {
     "dev": "webpack serve",
-    "build": "webpack",
+    "build": "webpack --mode production",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
