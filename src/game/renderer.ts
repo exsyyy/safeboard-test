@@ -148,11 +148,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, inpu
     ctx.fillStyle = '#8aadb9';
     ctx.font = '14px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(
-      `РЎРµРєС‚РѕСЂ РѕС‡РёС‰РµРЅ. РЎР»РµРґСѓСЋС‰Р°СЏ РІРѕР»РЅР° С‡РµСЂРµР· ${Math.max(1, Math.ceil(state.waveTimer))}`,
-      width / 2,
-      45,
-    );
+    ctx.fillText(`Волна ${state.wave + 1} через ${Math.max(1, Math.ceil(state.waveTimer))}`, width / 2, 45);
   }
   ctx.restore();
 }
